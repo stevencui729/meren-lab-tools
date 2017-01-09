@@ -2,7 +2,7 @@
 # pylint: disable=line-too-long
 """Classes to deal with tRNA sequences."""
 
-import os 
+import os
 import csv
 import sys
 import tempfile
@@ -10,7 +10,8 @@ import extractor
 import dbops
 import Levenshtein as lev
 
-import Oligotyping.lib.fastalib as u 
+import fastalib as u
+
 
 
 __author__ = "Steven Cui"
@@ -20,6 +21,7 @@ __license__ = "GPL 3.0"
 __version__ = 0.1
 __maintainer__ = "Steven Cui"
 __email__ = "stevencui729@gmail.com"
+
 
 
 class SorterStats:
@@ -49,7 +51,7 @@ class SorterStats:
         self.acceptor_seq_rejected = 0
         self.both_rejected = 0
         self.short_rejected = 0
-       
+
 
     def gen_sql_query_info_tuple(self):
         info_string_list = []
@@ -78,62 +80,62 @@ class SorterStats:
 
    #def format_line(self, label, value, level, padding = 55):
    #    """Handles indenting/formatting lines for statistics."""
-   #    levels_dict = {1:"%s%s\t%s\n" % 
+   #    levels_dict = {1:"%s%s\t%s\n" %
    #        (label, " " + " " * (padding - len(label)), value),
-   #        2:"\t%s%s\t%s\n" % 
+   #        2:"\t%s%s\t%s\n" %
    #            (label, " " + " " * (padding - (4 + len(label))), value),
-   #        3:"\t\t%s%s\t%s\n" % 
+   #        3:"\t\t%s%s\t%s\n" %
    #            (label, " " + " " * (padding - (12 + len(label))), value)}
    #    return levels_dict[level]
 
 
    #def write_stats(self, out_file_path):
-   #    """Writes statistics to an output file.""" 
+   #    """Writes statistics to an output file."""
    #    with open(out_file_path, "w") as outfile:
-   #        outfile.write(self.format_line("Total seqs", "%d" % 
+   #        outfile.write(self.format_line("Total seqs", "%d" %
    #            self.total_seqs,1))
    #        outfile.write(self.format_line("Total full-length", "%d" %
    #            self.total_full_length, 1))
    #        outfile.write(self.format_line("With trailer", "%d" %
    #            self.num_trailer, 1))
-   #        outfile.write(self.format_line("Total passed", "%d" % 
+   #        outfile.write(self.format_line("Total passed", "%d" %
    #            self.total_passed, 1))
 
-   #        outfile.write(self.format_line("No divergence", "%d" % 
+   #        outfile.write(self.format_line("No divergence", "%d" %
    #            self.no_divergence, 2))
-   #        outfile.write(self.format_line("T-loop divergence", "%d" % 
+   #        outfile.write(self.format_line("T-loop divergence", "%d" %
    #            self.t_loop_divergence, 2))
-   #        outfile.write(self.format_line("Divergence at pos 0", "%d" % 
+   #        outfile.write(self.format_line("Divergence at pos 0", "%d" %
    #            self.div_at_0, 3))
-   #        outfile.write(self.format_line("Divergence at pos 1", "%d" % 
+   #        outfile.write(self.format_line("Divergence at pos 1", "%d" %
    #            self.div_at_1, 3))
-   #        outfile.write(self.format_line("Divergence at pos 2", "%d" % 
+   #        outfile.write(self.format_line("Divergence at pos 2", "%d" %
    #            self.div_at_2, 3))
-   #        outfile.write(self.format_line("Divergence at pos 3", "%d" % 
+   #        outfile.write(self.format_line("Divergence at pos 3", "%d" %
    #            self.div_at_3, 3))
    #        outfile.write(self.format_line("Divergence at pos 8", "%d" %
    #            self.div_at_8, 3))
-   #        outfile.write(self.format_line("Acceptor divergence", "%d" % 
+   #        outfile.write(self.format_line("Acceptor divergence", "%d" %
    #            self.acceptor_divergence, 2))
-   #        outfile.write(self.format_line("Divergence at pos -3", "%d" % 
+   #        outfile.write(self.format_line("Divergence at pos -3", "%d" %
    #            self.div_at_neg_3, 3))
-   #        outfile.write(self.format_line("Divergence at pos -2", "%d" % 
+   #        outfile.write(self.format_line("Divergence at pos -2", "%d" %
    #            self.div_at_neg_2, 3))
-   #        outfile.write(self.format_line("Divergence at pos -1", "%d" % 
+   #        outfile.write(self.format_line("Divergence at pos -1", "%d" %
    #            self.div_at_neg_1, 3))
 
-   #        outfile.write(self.format_line("Total failed", "%d" % 
+   #        outfile.write(self.format_line("Total failed", "%d" %
    #            self.total_rejected, 1))
-   #        outfile.write(self.format_line("T-loop seq rejected", "%d" % 
+   #        outfile.write(self.format_line("T-loop seq rejected", "%d" %
    #            self.t_loop_seq_rejected, 2))
-   #        outfile.write(self.format_line("Acceptor seq rejected", "%d" % 
+   #        outfile.write(self.format_line("Acceptor seq rejected", "%d" %
    #            self.acceptor_seq_rejected, 2))
-   #        outfile.write(self.format_line("Both rejected", "%d" % 
+   #        outfile.write(self.format_line("Both rejected", "%d" %
    #            self.both_rejected, 2))
-   #        outfile.write(self.format_line("Short rejected", "%d" % 
+   #        outfile.write(self.format_line("Short rejected", "%d" %
    #            self.short_rejected, 2))
- 
-       
+
+
 class SeqSpecs:
     """Class to store seq information during sort."""
 
@@ -177,10 +179,10 @@ class SeqSpecs:
    #    """
    #    temp_dict = {"ID" : id, "Seq" : self.seq, "3-trailer" :
    #        self.three_trailer, "t-loop" : self.t_loop_seq, "acceptor" :
-   #        self.acceptor_seq, "full-length" : str(self.full_length), 
+   #        self.acceptor_seq, "full-length" : str(self.full_length),
    #        "Seq_length" : str(self.length), "Trailer_length" :
    #        str(self.trailer_length), "Anticodon" : self.anticodon}
-   #    writer.writerow(temp_dict) 
+   #    writer.writerow(temp_dict)
 
     def gen_sql_query_info_tuple(self, id):
         """Generates tuple of values to add into database to use in SQL query."""
@@ -194,7 +196,7 @@ class SeqSpecs:
         else:
             info_string_list.append(self.three_trailer)
        #info_string_list.append(self.three_trailer)
-       
+
         info_string_list.append(self.t_loop_seq)
         info_string_list.append(self.acceptor_seq)
         info_string_list.append(str(self.full_length))
@@ -207,13 +209,13 @@ class SeqSpecs:
         else:
             info_string_list.append(self.anticodon)
        #info_string_list.append(self.anticodon)
-        
+
         return tuple(info_string_list)
 
 
 class Sorter:
     """Class that handles the sorting of the seqs."""
-    
+
     def __init__(self):
         """Initializes variables for input/output files and statistics."""
         self.passed_seqs_write_fasta = ""
@@ -231,7 +233,7 @@ class Sorter:
         self.sort_stats = SorterStats()
         self.extractor = extractor.Extractor()
         self.db = None
-        seq_count_dict = {}                
+        seq_count_dict = {}
 
 
     def set_file_names(self, args):
@@ -246,9 +248,9 @@ class Sorter:
         self.read_fasta = u.SequenceSource(args.readfile)
         self.no_trailer_tabfile = args.sample_name + "_TAB_NO_TRAILER"
         self.trailer_tabfile = args.sample_name + "_TAB_TRAILER"
-        
+
         self.extractor.set_file_names(args.sample_name)
-        
+
         if args.output_path:
             if args.output_path.endswith(".db"):
                 self.tRNA_DB_file = args.output_path
@@ -297,13 +299,13 @@ class Sorter:
                 cur_seq_specs.full_length = True
         return cur_seq_specs
 
-    
+
     def assign_anticodons(self, cur_seq_specs):
         """Takes a SeqSpecs class and tries to assign an anticodon to it"""
         if cur_seq_specs.full_length:
             anticodon = ",".join(self.extractor.extract_anticodon(cur_seq_specs.seq))
             cur_seq_specs.anticodon = anticodon
-        else: 
+        else:
             anticodon = ",".join(self.extractor.extract_anticodon_not_full_length(cur_seq_specs.seq))
             cur_seq_specs.anticodon = anticodon
         return cur_seq_specs
@@ -321,7 +323,7 @@ class Sorter:
         return cur_seq_specs
 
 
-    def check_seq_count(self, cur_seq_specs)
+    def check_seq_count(self, cur_seq_specs):
         """Checks the sequence in current SeqSpecs to see if the seq has
         already been encountered already, increments count if it has,
         adds it to the dict.
@@ -358,7 +360,7 @@ class Sorter:
         t_loop_error = True
         acceptor_error = True
         cur_seq_specs = SeqSpecs()
-        
+
 
         # Start the sliding window at the last 24 bases, and move to the left
         # one at a time
@@ -366,12 +368,12 @@ class Sorter:
             sub_str = seq[-(i + sub_size):(length - i)]
             t_loop_seq = sub_str[0:9]
             acceptor_seq = sub_str[-3:]
-            t_loop_dist = (lev.distance("GTTC", sub_str[0:4]) 
+            t_loop_dist = (lev.distance("GTTC", sub_str[0:4])
                 + lev.distance("C", sub_str[8]))
             acceptor_dist = lev.distance("CCA", sub_str[-3:])
             mis_count = t_loop_dist + acceptor_dist
-           
-            if t_loop_dist < 1:    
+
+            if t_loop_dist < 1:
                 t_loop_error = False
             else:
                 t_loop_error = True
@@ -392,7 +394,7 @@ class Sorter:
                 cur_seq_specs = self.handle_pass_seq(cur_seq_specs, i)
                 res_tup = (True, cur_seq_specs)
                 return res_tup
-        
+
         # Handles a failed sequence
         if cur_seq_specs.t_loop_error and cur_seq_specs.acceptor_error:
             if length < 24:
@@ -415,7 +417,7 @@ class Sorter:
    #    # Declare and assign variables for output files
    #    tabfile = open(self.no_trailer_tabfile, "w")
    #    trailer_tabfile = open(self.trailer_tabfile, "w")
-   #   
+   #
    #    temp_tabfile_reader = csv.DictReader(out_tmp, delimiter="\t")
    #    tabfile_writer = csv.DictWriter(tabfile, fieldnames=self.fieldnames,
    #        delimiter="\t")
@@ -429,28 +431,28 @@ class Sorter:
    #        row["Seq"] = ("-" * (self.max_seq_width - int(row["Seq_length"]))) + row["Seq"]
    #        if row["Trailer_length"] == "0":
    #            row["3-trailer"] = "_"
-   #            tabfile_writer.writerow(row)   
+   #            tabfile_writer.writerow(row)
    #        else:
    #            trailer_tabfile_writer.writerow(row)
    #            trailer_count += 1
 
    #    tabfile.close()
    #    trailer_tabfile.close()
-   #   
+   #
    #    self.sort_stats.num_trailer = trailer_count
 
 
    #def write_to_outputs(self, spec_writer):
    #    """Writes the sort results to output files."""
    #    self.sort_stats.total_seqs += 1
-   #    is_tRNA_result = self.is_tRNA(self.read_fasta.seq.upper()) 
+   #    is_tRNA_result = self.is_tRNA(self.read_fasta.seq.upper())
    #    mod_id = is_tRNA_result[1].gen_id_string(
-   #        self.read_fasta.id.split('|')[0]) 
+   #        self.read_fasta.id.split('|')[0])
 
    #    if is_tRNA_result[0]:
    #        self.passed_seqs_write_fasta.write_id(mod_id)
    #        self.passed_seqs_write_fasta.write_seq(is_tRNA_result[1].seq)
-   #        is_tRNA_result[1].write_specs(spec_writer, 
+   #        is_tRNA_result[1].write_specs(spec_writer,
    #            self.read_fasta.id.split('|')[0])
    #        self.db.insert_seq(is_tRNA_result[1],
    #            self.read_fasta.id.split('|')[0])
@@ -465,25 +467,26 @@ class Sorter:
    #def write_sorted(self, readfile):
    #    """Reads in csv files and rewrites them, sorted by seq length."""
    #    sort_list = []
-   #    with open(readfile, "r") as temp_tabfile:  
+   #    with open(readfile, "r") as temp_tabfile:
    #        temp_tabfile_reader = csv.DictReader(temp_tabfile, delimiter="\t")
    #        for row in temp_tabfile_reader:
    #            sort_list.append(row)
 
    #    sort_list.sort(key=lambda dict: dict["Seq_length"], reverse=True)
-   #   
+   #
    #    with open(readfile, "w") as tabfile:
    #        tabfile_writer = csv.DictWriter(tabfile, fieldnames=self.fieldnames, delimiter="\t")
    #        tabfile_writer.writeheader()
    #        tabfile_writer.writerows(sort_list)
-   
-    def add_to_database(self):
-        self.sort_stats.total_seqs += 1
-        is_tRNA_result = self.is_tRNA(self.read_fasta.seq.upper()) 
 
-        if is_tRNA_result[0]:
-            self.db.insert_seq(is_tRNA_result[1],
-                self.read_fasta.id.split('|')[0])
+#    def add_to_database(self):
+#        self.sort_stats.total_seqs += 1
+#        is_tRNA_result = self.is_tRNA(self.read_fasta.seq.upper())
+#
+#        if is_tRNA_result[0]:
+#            biglist.append((is_trna_result[1],self.read_fasta.id.split('|')[0]))
+            #self.db.insert_seq(is_tRNA_result[1],
+                #self.read_fasta.id.split('|')[0])
 
 
     def gen_sql_query_info_tuple(self):
@@ -496,31 +499,51 @@ class Sorter:
 
 
     def run(self, args):
+        biglist = []
+        mem_const = 2000000 #rounding down 2 MB, should eventually make this an arg
         """Run the sorter."""
         print "sort started"
         self.set_file_names(args)
         self.db = dbops.tRNADatabase(self.tRNA_DB_file)
 
 
-       
-        while self.read_fasta.next():
-            self.add_to_database()
 
-        self.db.insert_seq_counts(self.seq_count_dict)
+        while self.read_fasta.next():
+            self.sort_stats.total_seqs += 1 #separating this from the original function call of add to database to avoid global lists
+            is_tRNA_result = self.is_tRNA(self.read_fasta.seq.upper())
+
+            if is_tRNA_result[0]:
+                biglist.append((is_tRNA_result[1],self.read_fasta.id.split('|')[0]))
+
+            if sys.getsizeof(biglist) > mem_const: #as long as the list isn't large, it'll keep populating
+                for item in biglist:
+                    a,b = item #unpacking our list, for the time being separate instead of a lambda
+                    self.db.insert_seq(a,b)
+                biglist = []
+
+        for item in biglist: #final loop, adding all items to db
+            a,b = item
+            self.db.insert_seq(a,b)
+        biglist = []
+        
+
+
+
+
 
        #with tempfile.TemporaryFile() as out_tmp:
-       #    spec_writer = csv.DictWriter(out_tmp, fieldnames=self.fieldnames, 
+       #    spec_writer = csv.DictWriter(out_tmp, fieldnames=self.fieldnames,
        #        delimiter="\t")
        #    spec_writer.writeheader()
        #
        #    while self.read_fasta.next():
        #        self.write_to_outputs(spec_writer)
-       #    
+       #
        #    out_tmp.seek(0)
        #    self.fix_spacing_csv(out_tmp)
-        
+
         print "finished preliminary tRNA sort"
-        
+
         self.db.insert_stats(self.sort_stats)
 
         self.db.db.disconnect()
